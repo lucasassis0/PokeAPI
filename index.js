@@ -1,6 +1,9 @@
 var user = require("readline-sync")
 var axios = require("axios")
 var fs = require("fs")
+var tr = require("./treinador")
+
+var treinador = new tr
 
 menu()
 
@@ -14,54 +17,39 @@ function menu() {
 }
 
 function pegaTipo(tipo) {
-    var type = []
     for (let i = 0; i < tipo.length; i++) {
-        type[i] = tipo[i].type.name
+        treinador.pokebola.tipo[i] = tipo[i].type.name
     }
-    return type
+    return treinador.pokebola.tipo
 }
 
 function pegaHabilidade(habilidades) {
-    var ab = []
     for (let i = 0; i < habilidades.length; i++) {
-        ab[i] = habilidades[i].ability.name
+        treinador.pokebola.habilidades[i] = habilidades[i].ability.name
     }
-    return ab
-}
-
-var pokemon = new Object() 
-pokemon = {
-    nome: "",
-    tipo: [],
-    habilidades: []
-}
-
-
-var treinador = new Object()
-treinador = {
-    nome: "",
-    pokebola: [pokemon]
+    return treinador.pokebola.habilidades
 }
 
 function pesquisaPokemon() {
     treinador.nome = user.question("Treinador: ")
+    
     var id = user.question("Digite o ID ou nome do pokemon para mais informacoes: ")
     
     axios.get(`https://pokeapi.co/api/v2/pokemon/${id}/`)
         .then(resultado =>{
-            console.log(`\nParabens ${treinador}, o pokemon pesquisado foi: `);
+            console.log(`\nParabens ${treinador.nome}, o pokemon pesquisado foi: `);
         
-            nome = resultado.data.name.toUpperCase()
+            treinador.pokebola.nome = resultado.data.name.toUpperCase()
 
-            console.log("\nPokemon: " + nome);
+            console.log("\nPokemon: " + treinador.pokebola.nome);
         
-            tipo = resultado.data.types
-            console.log("\nTipo: " + pegaTipo(tipo).join(', '));
-        
-            habilidades = resultado.data.abilities
-            console.log("\nHabilidades: " + pegaHabilidade(habilidades).join(', '));
+            treinador.pokebola.tipo = resultado.data.types
+            console.log("\nTipo: " + pegaTipo(treinador.pokebola.tipo).join(', '));
+
+            treinador.pokebola.habilidades = resultado.data.abilities
+            console.log("\nHabilidades: " + pegaHabilidade(treinador.pokebola.habilidades).join(', ') + "\n");
             
-            perguntaSalvar(treinador, nome, tipo, habilidades)
+            perguntaSalvar(treinador)
         })
 
         .catch(erro =>{
@@ -72,7 +60,7 @@ function pesquisaPokemon() {
 function perguntaSalvar(treinador) {
     var r = user.question('Deseja salvar o Pokemon pesquisado em sua pokedex? (S/N)\n==> ')
     if (r.trim().toUpperCase().charAt(0) === 'S'){
-        salvar(treinador, nome, tipo, habilidades)
+        salvar(treinador)
     }else if(r.trim().toUpperCase().charAt(0) === 'N'){
         menu()
     }else{
@@ -81,18 +69,14 @@ function perguntaSalvar(treinador) {
     }
 }
 
-function salvar(treinador, nome, tipo, habilidades) {
-    //treinador.pokebola[treinador.pokebola.length].pokemon.name.push(nome)
-    //treinador.pokebola[treinador.pokebola.length].pokemon.
-    treinador = {
-        pokebola: {
-            nome: nome,
-            tipo: pegaTipo(tipo),
-            habilidades: pegaHabilidade(habilidades)
-        }
-    }
+function salvar(treinador) {
+    /*var json =   
+    if(){
+
+    }*/
     
     var jsonSerializado = JSON.stringify(treinador)
-    var path = './treinadores.json'
-    fs.writeFileSync(jsonSerializado,path)
+    var path = './pokedex.json'
+    fs.writeFileSync(path, jsonSerializado)
+    menu()
 }
