@@ -1,8 +1,8 @@
 class pokemon {
-    constructor(nome, tipo, habilidades){
+    constructor(nome){
         this.nome = nome;
-        this.tipo = tipo;
-        this.habilidades = habilidades;
+        this.tipo = [];
+        this.habilidades = [];
     }
 }
 
