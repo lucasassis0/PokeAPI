@@ -8,12 +8,16 @@ var poke = require("./pokemon")
 menu()
 
 function menu() {
-    var x = user.questionInt("1.Procurar Pokemon\n2.Pesquisar Pokedex\n3.Sair\nEscolha uma opcao: ")
+    var x = user.questionInt("1.Procurar Pokemon\n2.Pesquisar Pokedex\n3.Pesquisar passiva\n4.Mostrar tipo\n5.Sair\nEscolha uma opcao: ")
     if (x === 1) {
         procuraPokemon()
     }else if(x == 2){
         consultaPokedex()
     }else if(x === 3){
+        pegaPassiva()
+    }else if(x === 4){
+        mostraTipo()
+    }else if(x === 5){
         process.exit()
     }
 }
@@ -31,7 +35,6 @@ function procuraPokemon() {
     axios.get(`https://pokeapi.co/api/v2/pokemon/${id}/`)
         .then(resultado =>{
             console.log(`\nParabens ${treinador.nome}, o pokemon pesquisado foi: `);
-            console.log(resultado);
             pokemon.nome = resultado.data.name.toUpperCase()
 
             console.log("\nPokemon: " + pokemon.nome);
@@ -58,6 +61,109 @@ function procuraPokemon() {
         .catch(erro =>{
             console.log(erro)
         })
+    menu()
+}
+
+function pegaPassiva() {
+    var id = user.question("Digite o ID ou nome do pokemon para mais informacoes: ")
+
+    axios.get(`https://pokeapi.co/api/v2/ability/${id}/`)
+        .then(resultado => {
+            var passiva = resultado.data.effect_entries
+
+            for (let i = 0; i < passiva.length; i++) {
+                console.log("\n" + passiva[i].effect)                
+            }
+            menu()
+        })
+        .catch(erro => {
+            console.log(erro);
+            menu()
+        })
+}
+
+function mostraTipo() {
+    var id = user.question("Digite o ID ou nome do tipo: ")
+    
+    axios.get(`https://pokeapi.co/api/v2/type/${id}/`)
+        .then(resultado => {
+            var relacoes = resultado.data.damage_relations
+            console.log(`Tipo: ${resultado.data.name}\n`)
+
+            console.log(`Recebe o dobro do dano de pokemons do tipo: ${doubleFrom(relacoes).join(', ')}`);
+            console.log(`Aplica o dobro do dano em pokemons do tipo: ${doubleTo(relacoes).join(', ')}\n`);
+            console.log(`Recebe a metade do dano de pokemons do tipo: ${halfFrom(relacoes).join(', ')}`);
+            console.log(`Aplica a metade do dano em pokemons do tipo: ${halfTo(relacoes).join(', ')}\n`);
+            console.log(`Não recebe dano de pokemons do tipo: ${noFrom(relacoes).join(', ')}`);
+            console.log(`Não aplica dano em pokemons do tipo: ${noTo(relacoes).join(', ')}\n`);
+
+            menu()
+        })
+
+        .catch(erro => {
+            console.log(erro);
+            menu()
+        })    
+}
+
+function doubleFrom(relacoes) {
+    var arr = []
+    
+    for (let i = 0; i < relacoes.double_damage_from.length; i++) {
+        arr[i] = relacoes.double_damage_from[i].name
+    }
+
+    return arr
+}
+
+function doubleTo(relacoes) {
+    var arr = []
+
+    for (let i = 0; i < relacoes.double_damage_to.length; i++) {
+        arr[i] = relacoes.double_damage_to[i].name
+    }
+
+    return arr
+}
+
+function halfFrom(relacoes) {
+    var arr = []
+
+    for (let i = 0; i < relacoes.half_damage_from.length; i++) {
+        arr[i] = relacoes.half_damage_from[i].name
+    }
+
+    return arr
+}
+
+function halfTo(relacoes) {
+    var arr = []
+
+    for (let i = 0; i < relacoes.half_damage_to.length; i++) {
+        arr[i] = relacoes.half_damage_to[i].name
+    }
+
+    return arr
+}
+
+function noFrom(relacoes) {
+    var arr = []
+
+    for (let i = 0; i < relacoes.no_damage_from.length; i++) {
+        arr[i] = relacoes.no_damage_from[i].name
+    }
+
+    return arr
+}
+
+function noTo(relacoes) {
+    var arr = []
+
+    for (let i = 0; i < relacoes.no_damage_to.length; i++) {
+        arr[i] = relacoes.no_damage_to[i].name
+    }
+
+    return arr
 }
 
 function perguntaSalvar(treinador) {
