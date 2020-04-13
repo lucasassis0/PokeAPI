@@ -8,7 +8,7 @@ var poke = require("./pokemon")
 menu()
 
 function menu() {
-    var x = user.questionInt("1.Procurar Pokemon\n2.Pesquisar Pokedex\n3.Pesquisar passiva\n4.Mostrar tipo\n5.Sair\nEscolha uma opcao: ")
+    var x = user.questionInt("1.Procurar Pokemon\n2.Pesquisar Pokedex\n3.Pesquisar passiva\n4.Mostrar tipo\n5.Mostrar pokemons do mesmo tipo\n6.Sair\nEscolha uma opcao: ")
     if (x === 1) {
         procuraPokemon()
     }else if(x == 2){
@@ -18,6 +18,8 @@ function menu() {
     }else if(x === 4){
         mostraTipo()
     }else if(x === 5){
+        mostrarMesmoTipo()
+    }else if(x === 6){
         process.exit()
     }
 }
@@ -164,6 +166,24 @@ function noTo(relacoes) {
     }
 
     return arr
+}
+
+function mostrarMesmoTipo(){
+    var id = user.question("Digite o ID ou nome do tipo: ")
+    
+    axios.get(`https://pokeapi.co/api/v2/type/${id}/`)
+        .then(resultado => {
+                console.log(`\nTipo: ${resultado.data.name}`)
+
+                var arr = []
+                resultado.data.pokemon.forEach(element => {
+                    arr.push(element.pokemon.name)
+                });
+
+                console.log('\n' + arr.join(', ') + '\n');
+
+                menu()
+        })
 }
 
 function perguntaSalvar(treinador) {
