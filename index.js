@@ -33,7 +33,7 @@ function procuraPokemon() {
     treinador.nome = user.question("Treinador: ")
 
     var id = user.question("Digite o ID ou nome do pokemon para mais informacoes: ")
-    
+
     axios.get(`https://pokeapi.co/api/v2/pokemon/${id}/`)
         .then(resultado =>{
             console.log(`\nParabens ${treinador.nome}, o pokemon pesquisado foi: `);
@@ -62,8 +62,8 @@ function procuraPokemon() {
 
         .catch(erro =>{
             console.log(erro)
+            menu()
         })
-    menu()
 }
 
 function pegaPassiva() {
